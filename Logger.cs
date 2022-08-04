@@ -4,18 +4,33 @@ using System;
 
 class Logger 
 {
+    private string _applicationType { get; set; } // desktop или console
     private Dictionary<string, string> _logPrefix { get; set; }
 
-    public Logger(bool differentFiles = false) 
+    public Logger(string appType = "desktop") 
     {
-        _differentFiles = differentFiles;
-        _logPrefix = new Dictionary<string, string>() 
+        try {
+            if (appType.ToLowerCase() == "desktop" || appType.ToLowerCase() == "console") 
+            {
+                _applicationType = appType.ToLowerCase();
+            }
+            else
+            {
+                throw new Exception("Неизвестный тип приложения. Ожидалось: Desktop или Console");
+            }
+
+            _logPrefix = new Dictionary<string, string>() 
+            {
+                {"Info", "INFO > "},
+                {"Warn", "WARN > "},
+                {"Error", "ERROR > "},
+                {"Debug", "DEBUG > "}
+            };
+        }
+        catch (Exception exception) 
         {
-            {"Info", "INFO > "},
-            {"Warn", "WARN > "},
-            {"Error", "ERROR > "},
-            {"Debug", "DEBUG > "}
-        };
+            MessageBox.Show(exception.StackTrace, "Ошибка");
+        }
     }
 
     public bool Init() 
@@ -29,12 +44,20 @@ class Logger
 
             if (!LogsFileExists) 
             {
-                // Написать создание файла logs/logs.log
+                File.Create("logs/logs.log");
             }
         }
         catch (Exception exception) 
         {
-            MessageBox.Show(exception.StackTrace, "Ошибка");
+            if (_applicationType == "desktop") 
+            {
+                MessageBox.Show(exception.StackTrace, "Ошибка");
+            }
+            else
+            {
+                Console.WriteLine($"Ошибка: {exception.StackTrace}");
+            }
+
             return false;
         }
 
@@ -51,7 +74,15 @@ class Logger
         }
         catch (Exception exception) 
         {
-            MessageBox.Show(exception.StackTrace, "Ошибка");
+            if (_applicationType == "desktop") 
+            {
+                MessageBox.Show(exception.StackTrace, "Ошибка");
+            }
+            else 
+            {
+                Console.WriteLine($"Ошибка: {exception.StackTrace}");
+            }
+
             return false;
         }
 
@@ -68,7 +99,14 @@ class Logger
         }
         catch (Exception exception) 
         {
-            MessageBox.Show(exception.StackTrace, "Ошибка");
+            if (_applicationType == "desktop") 
+            {
+                MessageBox.Show(exception.StackTrace, "Ошибка");
+            }
+            else 
+            {
+                Console.WriteLine($"Ошибка: {exception.StackTrace}");
+            }
             return false;
         }
 
@@ -88,14 +126,21 @@ class Logger
         }
         catch (Exception exception) 
         {
-            MessageBox.Show(exception.StackTrace, "Ошибка");
+            if (_applicationType == "desktop") 
+            {
+                MessageBox.Show(exception.StackTrace, "Ошибка");
+            }
+            else 
+            {
+                Console.WriteLine($"Ошибка: {exception.StackTrace}");
+            }
             return false;
         }
 
         return true;
     }
 
-    public bool WriteInLogs(string prefixKey) 
+    public bool WriteInLogs(string prefixKey, string message) 
     {
         try 
         {
@@ -106,12 +151,26 @@ class Logger
 
             if (LogsFileExists) 
             {
-                // Реализовать запись в логи
+                using (StreamWriter writer = new StreamWriter("logs/logs.log", true))
+                {
+                    writer.WriteLine($"{_logPrefix[prefixKey]}", );
+                }
+            }
+            else 
+            {
+                throw new Exception("Файл logs/logs.log не существует");
             }
         }
         catch (Exception exception) 
         {
-            MessageBox.Show(exception.StackTrace, "Ошибка");
+            if (_applicationType == "desktop") 
+            { 
+                MessageBox.Show(exception.StackTrace, "Ошибка");
+            }
+            else 
+            {
+                Console.WriteLine($"Ошибка: {exception.StackTrace}");
+            }
             return false;
         }
 
